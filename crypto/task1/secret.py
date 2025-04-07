@@ -1,0 +1,1 @@
+flag=b"NUAACTF{Traditional_sign-in_questions}"

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="easeljs-0.8.0.min.js"></script>
+    <script src="Cell.js"></script>
+    <script src="Circle.js"></script>
+</head>
+<body>
+    <canvas id="gameView" width="550px" height="550px"></canvas>
+	
+    <script src="app.js"></script>
+	<div style="position:absolute;left:580px;top:0px;">
+	 <p>游戏说明：<br/>
+		1.游戏初始化时神经猫处于最中间，位置为绿色，随机产生的围墙为橙色。<br/>
+		没有被围住的区域为灰色，游戏就是点击灰色区域产生围墙（灰色变橙色），<br/>
+		从而把神经猫包围在围墙中，若围墙包围不了神经猫，则神经猫逃走。<br/>
+        2. 神经猫处于能逃跑状态时为绿色，神经猫被包围时（处于一个圈内）时为红色。<br/>
+		3.神经猫每次逃跑的方向都是从当前位置找最短路径的方向。<br/>
+        4.以后有时间时会考虑像真实的神经猫游戏那样为神经猫加上动画效果。<br/>
+    </p>
+	</div>
+   
+</body>
+</html>

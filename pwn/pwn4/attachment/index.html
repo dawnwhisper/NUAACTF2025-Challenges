@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>简单计算器</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>简单计算器</h1>
+    </header>
+    <section>
+        <form action="/cgi-bin/calc.cgi" method="GET">
+            <label for="expr">请输入表达式：</label>
+            <input type="text" id="expr" name="expr" placeholder="例如 2+3*4">
+            <button type="submit">计算</button>
+        </form>
+        <div id="result">
+            <!-- 显示计算结果 -->
+        </div>
+    </section>
+    <script src="js/script.js"></script>
+</body>
+</html>
