@@ -1,6 +1,7 @@
 import hashlib
 import pwn
-from secret import flag, key
+from Crypto.Util.number import *
+from secret import flag, key, e
 
 s_box = [
     0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
@@ -21,33 +22,51 @@ s_box = [
     0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
 ]
 
+
 def sbox_substitution(data):
     return bytes([s_box[b] for b in data])
 
-def encrypt(block, key):
-    c = []
-    for i in range(6):
-        temp = sbox_substitution(block[i])  
-        temp = temp[:-2] + b"\x00"*2  
-        temp = pwn.xor(temp, key)
-        key = key[-2:] + key[:-2]       
-        c.append(temp)
-    return c
 
-message = flag[8:-1] 
+def encrypt(block, key_):
+    cs = []
+    for i in range(6):
+        temp = sbox_substitution(block[i])
+        temp = temp[:-2] + b"\x00" * 2
+        temp = pwn.xor(temp, key_)
+        key_ = key_[-2:] + key_[:-2]
+        cs.append(temp)
+    return cs
+
+def multiply(z1, z2):
+    real = z1[0] * z2[0] - z1[1] * z2[1]
+    imag = z1[0] * z2[1] + z1[1] * z2[0]
+    return real, imag
+
+
+p = getPrime(1024)
+q = getPrime(1024)
+n = p * q
+assert isPrime(e)
+c = long_to_bytes(pow(bytes_to_long(flag), e, n))
+print(f"c2={c[72:]}")
+print(f"y**2-y-e**2+e=={2 * 19055507}")
+print(f"hint2={multiply((20, p), (25, q))}")
+message = c[:72]
 n = len(message) // 6
-blocks = [message[i:i+n] for i in range(0, len(message), n)]
+blocks = [message[i:i + n] for i in range(0, len(message), n)]
 
 print(f"c={encrypt(blocks, key)}")
 for b in blocks:
     print(f"\"{hashlib.sha256(b).hexdigest()}\"")
-
 '''
-c=[b'\xde\x9ar\xa9\xb0\x1aK\xf3\xab\xb7er', b'F\xaa\\R\xe1j\x87\xb8\xf2\xffsp', b'k\xda(?\xdefr\x95|Ehi', b'\xc2$kS\xa6\xb1\x87\xa2\xaf\x81_W', b'G\x8fp\xf3\x88\xe6\xbd\xd8\xbf,wn', b'r|\xb0t\xc2\xaa0S\xcf\x89Da']
-"d736fc5a5fee90c54752d4e5b23d66b9aa4b01261db55d8d29ed70629c6f8c54"
-"14a206a9612e95a60bc190d23ad4dc9dac07c22857b2a13664fd10c26f0dc4b1"
-"64c0e6fad46f894793e97ec8286970681c3e3f874f2a3c58f738ffe35aa933a5"
-"2b112cc92e98877364b05c422fc409960bb5819339f1cdd81a8d25991b9a7942"
-"a490463c44ac3bc52ccd95da516b6fd500b6e828aa735c03dd6f2bd31695b6ae"
-"e0b62146783a7dbaf494fb39099366f645a08558985079d1cf0dba1d168c7132"
+c2=b"\xecl\x9fq\x19\xaa=\xf63\xce\x10\xe7\n\xa2\xfe\x1205\x0bwfv|\x88\xaa\\z|\xab\x1c|\xb5\xbd\x13=o \xd9\x94\x1d:\xc7'\xd2&\x91ML\xa2\x9d\x9ag\xb5\xa3\x84\xe4\xa6\x8c\xf8\xe3\xa6\x91\xdau9V,\xe2k\x12\x8b\xf4\xfdS\x9dapJ@\xcd`\xa5\xf5|\xbc\x97\xd2T\xce\xcc\x01\x83\x0f,\x88\xb2;}\x02\x87\x8f\x02\xbf\xb2\x1ehO\x93\xc9\xf6&Te\xcej\xfb.Qxn\x95\x05\xf6!\x84\xf9\xdf<\xdf\xbd\xd78}CB\xa4\x99\x03\xf8\x9b\xfe'\xfb\xda\xafI\xd6/\x8e\xe9\xf6\x9d=K\xa8?Y)<\xc2v\xf9\xd2\xc8\xf7\x18\x96\xd1+\x97\xb2\xe3\x804Aq<Q+\x8d\x9d\x03\x06g"
+y**2-y-e**2+e==38111014
+hint2=(-14412309885795408436657260020142960025622079556595429918662401741824508383324424796997883886820200433512616096378897363866158056885248264943978511367756268527569447859212227207299336962895670517697865214249821812431228839233824772618174047889662645184703292400871522664849392802247757196674750123988110939399943125059107986376762316974486119879521914533803021441701289407121067320960975302346006650795029105888660217164081815320227402720149192084902594112056861244820008243228477492770869760218604331659521476073325455423853427715804378005535282248078623089732384298504539428980245460427732615492251400199929881043533, 5408413627596064340662671371172161189220332605866324491198127130024480936313978661346151257364320118889430074868550419529338845862245246401188651751552807338026536437530752178105718913079119483530368553175301592495066868361876586084030477225090532115815167380920851600422684722746828910364989027150047202005795)
+c=[b'/\xd8\xccLu\x0c\x0e62\x88er', b'\xc6t\xcb\x8b\xd2&oJ\xf1\xf2sp', b'\xf0\x90\xdb\x10\xb4\n(\x9e\xdbNhi', b'D\xd3\xc1y4\x8c\xecT\x1c\xf7_W', b'EBQo`3?\x11m\xf4wn', b'S\xfaueny\x0f!\xcc\x87Da']
+"7db9073905729800f2e671c439a5e02bd7c10530448ebaaca9d833b6bbf2c66b"
+"9c9df0dfda6b3bb5eddec40730b1b8dd7b1880f34389225010202e51ab559826"
+"77372e5236e11aae083e7f177a31790c8cafd86eaa8cb7749ff7d8c517542380"
+"225ee0d80214ac3a35e92396f1dc368185bed22473c7d5b6c413d8f1bd80fb6d"
+"7527ae1ba9f5069e534d1dee1d1f7996a87ba24cd5c5f4e70d75f63e413e71e7"
+"50569fb96ea0f7deff0a375f3b90ad54ce6c40d5cd231c998cd4b9f403a058fd"
 '''
