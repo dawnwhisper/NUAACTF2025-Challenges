@@ -21,4 +21,4 @@ ENV FLAG="default_flag"
 EXPOSE 8080
 
 # 在启动容器时，将环境变量 FLAG 的内容写入 flag.txt, 然后启动 httpd 程序
-CMD ["/bin/bash", "-c", "echo \"$FLAG\" > flag.txt && ./httpd"]
+CMD ["/bin/bash", "-c", "echo \"$FLAG\" > flag.txt && unset FLAG && ./httpd"]

@@ -4,6 +4,7 @@ if [ -n "$FLAG" ]; then
     echo "$FLAG" > /home/ctf/flag
     chown root:root /home/ctf/flag
     chmod 400 /home/ctf/flag
+    unset FLAG
 fi
 
 echo "Starting xinetd..."
